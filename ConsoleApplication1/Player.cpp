@@ -1,4 +1,53 @@
 #include "Player.h"
+#include "Game.h"
+    void Player::setNumberOfGames(int inputgames)
+    {
+        NumberOfGames = inputgames;
+    }
+    int Player::getNumberOfGames()
+    {
+        return NumberOfGames;
+    }
+    void Player::setVictorysByBlackJack(int inputVictorys)
+    {
+        VictorysByBlackJack = inputVictorys;
+    }
+    int  Player::getVictorysByBlackJack()
+    {
+        return VictorysByBlackJack;
+    }
+    void Player::setLoosesByBlackJack(int inputLooses)
+    {
+        LoosesByBlackJack = inputLooses;
+    }
+    int Player::getLoosesByBlackJack()
+    {
+        return LoosesByBlackJack;
+    }
+    void Player::setMaxChips(int inputChips)
+    {
+        MaxChips = inputChips;
+    }
+    int Player::getMaxChips()
+    {
+        return MaxChips;
+    }
+    void Player::setMaxStepsCounter(int inputsteps)
+    {
+        MaxStepsCounter = inputsteps;
+    }
+    int Player::getMaxStepsCounter()
+    {
+        return MaxStepsCounter;
+    }
+    void Player::setMaxScore(int inputscore)
+    {
+        MaxScore = inputscore;
+    }
+    int Player::getMaxScore()
+    {
+        return MaxScore;
+    }
     void Player::clearHand()
     {
         hand.clear();
@@ -27,28 +76,41 @@
     {
         return hand[0].getValue();
     }
-    void Player::isLoss(Player& player, Player& dealer)
+    void Player::isLoss(Player& player, Player& dealer, bool Double)
     {
         if (player.score > 21)
             cout << "Игрок перебрал карты, дилер победил" << endl;
         else if (dealer.score > 21)
         {
             cout << "Дилер перебрал карты, игрок победил" << endl;
-            player.setChips(player.getChips() + player.getInputChips() * 2);
+            if(Double)
+                player.setChips(player.getChips() + player.getInputChips() * 4);
+            else
+                player.setChips(player.getChips() + player.getInputChips() * 2);
         }
         else if (player.score > dealer.score)
         {
             cout << "Счёт игрока больше, игрок победил" << endl;
-            player.setChips(player.getChips() + player.getInputChips() * 2);
+            if (Double)
+                player.setChips(player.getChips() + player.getInputChips() * 4);
+            else
+                player.setChips(player.getChips() + player.getInputChips() * 2);
         }
         else if (player.score < dealer.score)
+        {
             cout << "Счёт дилера больше, дилер победил" << endl;
+        }
         else if (player.getScore() == dealer.getScore())
         {
             cout << "Ничья!" << endl;
-            player.setChips(player.getChips() + player.getInputChips());
+            if (Double)
+                player.setChips(player.getChips() + player.getInputChips() * 2);
+            else
+                player.setChips(player.getChips() + player.getInputChips());
+
         }
     }
+
     void Player::showHand()
     {
         for (auto& card : hand) {
