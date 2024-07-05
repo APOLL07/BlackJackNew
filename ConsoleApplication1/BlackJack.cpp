@@ -46,65 +46,68 @@ int main()
             }
             cout << "Ставка принята!" << endl;
             player.setChips(player.getChips() - player.getInputChips());
-            player.clearHand();
-            dealer.clearHand();
+            player.clearHands();
+            dealer.clearHands();
             flag2 = true;
             Double = false;
-            player.setStepsCounter(0);
+            player.setLeftStepsCounter(0);
+            player.setRightStepsCounter(0);
             Game::startGame(player, dealer, deck);
             while (flag2)
             {
-                if (player.getScore() == 21 && player.getStepsCounter() == 2)
+                if (Game::CheckBlackJack(player, dealer, flag2))
                 {
-                    Game::showScore(dealer, "d");
-                    cout << "У игрока блэкджэк!" << endl;
-                    player.setChips(player.getChips() + player.getInputChips() * 3);
-                    player.setVictorysByBlackJack(player.getVictorysByBlackJack() + 1);
-                    flag2 = false;
-                    break;
-                }
-                else if (dealer.getScore() == 21 && player.getStepsCounter() == 2)
-                {
-                    cout << "У дилера блэкджэк!" << endl;
-                    player.setLoosesByBlackJack(player.getLoosesByBlackJack() + 1);
                     flag2 = false;
                     break;
                 }
                 cout << "Хотите взять карту?" << endl;
                 cout << "1 - Да" << endl;
-                if (player.getStepsCounter() == 2)
+                if (player.getLeftStepsCounter() == 2)
                     cout << "2 - Дабл" << endl;
+                if (player.getLeftStepsCounter() == 2 && player.CheckOnSplit(player))
+                    cout << "3 - Сплит" << endl;
                 cout << "0 - Нет" << endl;
                 cin >> choise;
                 switch (choise)
                 {
                 case'1':
-                    player.addCard(deck.getRandomCard());
-                    player.setStepsCounter(player.getStepsCounter() + 1);
+                    player.addLeftCards(deck.getRandomCard());
+                    player.setLeftStepsCounter(player.getLeftStepsCounter() + 1);
                     Game::showScore(player, "p");
-                    if (player.getScore() > 21)
+                    if (player.getLeftHandScore() > 21)
                     {
                         cout << "Вы перебрали карты, дилер победил" << endl;
                         flag2 = false;
                     }
                     break;
                 case'2':
-                    if (player.getStepsCounter() != 2)
+                    if (player.getLeftStepsCounter() != 2)
                         cout << "Введите допустимый вариант" << endl;
                     else
                     {
-                        Game::Double(player, dealer, deck, Double);
+                        Double = true;
+                        Game::DoubleLeft(player, dealer, deck, Double);
+                        while (dealer.getLeftHandScore() < 17)
+                        {
+                            dealer.addLeftCards(deck.getRandomCard());
+                            Game::showScore(dealer, "d");
+                        }
+                        Game::isLoss(player, dealer, Double);
                         flag2 = false;
                         break;
                     }
+                case'3':
+                        player.Split(player, dealer, deck);
+                        flag2 = false;
+                       break;
                 case'0':
                     Game::showScore(dealer, "d");
-                    while (dealer.getScore() < 17)
+                    while (dealer.getLeftHandScore() < 17)
                     {
-                        dealer.addCard(deck.getRandomCard());
+                        dealer.addLeftCards(deck.getRandomCard());
                         Game::showScore(dealer, "d");
                     }
-                    Player::isLoss(player, dealer, Double);
+                    Game::isLoss(player, dealer, Double);
                     flag2 = false;
                     break;
                 default:
@@ -127,10 +130,10 @@ int main()
             cout << "Введите возможный вариант" << endl;
             break;
         }
-        if (player.getStepsCounter() > player.getMaxStepsCounter())
-            player.setMaxStepsCounter(player.getStepsCounter());
-        if (player.getScore() > player.getMaxScore())
-            player.setMaxScore(player.getScore());
+        if (player.SumStepsCounter() > player.getMaxStepsCounter())
+            player.setMaxStepsCounter(player.SumStepsCounter());
+        if (player.getLeftHandScore() > player.getMaxScore())
+            player.setMaxScore(player.getLeftHandScore());
         if (player.getChips() > player.getMaxChips())
             player.setMaxChips(player.getChips());
         player.setNumberOfGames(player.getNumberOfGames() + 1);

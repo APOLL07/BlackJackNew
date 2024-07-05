@@ -1,5 +1,141 @@
 #include "Player.h"
 #include "Game.h"
+bool Player::CheckOnSplit(Player &player)
+{
+    for (int i = 0; i < Lefthand.size() - 1;i++)
+    {
+        return Lefthand[i].getRank() == Lefthand[i + 1].getRank();
+    }
+}
+void Player::Split(Player& player, Player& dealer, Deck& deck)
+{
+    bool Split = false;
+    for (int i = 0; i < Lefthand.size() - 1; i++)
+    {
+        if (Lefthand[i].getRank() == Lefthand[i + 1].getRank())
+            Split = true;
+    }
+    if (Split)
+    {
+        if (player.getChips() - player.getInputChips() > 0)
+        {
+            bool flag = true;
+            bool leftHandDouble = false;
+            bool rightHandDouble = false;
+            char choice = '0';
+            player.setChips(player.getChips() - player.getInputChips());
+            player.RightHand.push_back(Lefthand[1]);
+            player.setRightStepsCounter(1);
+            player.Lefthand.erase(player.Lefthand.begin() + 1, player.Lefthand.end());
+            player.setLeftStepsCounter(1);
+            player.addLeftCards(deck.getRandomCard());
+            player.setLeftStepsCounter(player.getLeftStepsCounter() + 1);
+            player.addRightCards(deck.getRandomCard());
+            player.setRightStepsCounter(player.getRightStepsCounter() + 1);
+            Game::showLeftScore(player);
+            Game::showRightScore(player);
+            while (flag) { // lefthand
+                flag = true;
+                cout << "Хотите добрать карту в левую руку?" << endl;
+                cout << "1 - Да" << endl;
+                if (player.getLeftStepsCounter() == 2)
+                    cout << "2 - Дабл(левая рука)" << endl;
+                cout << "0 - Нет" << endl;
+                cin >> choice;
+                switch (choice)
+                {
+                case '1':
+                    player.addLeftCards(deck.getRandomCard());
+                    player.setLeftStepsCounter(player.getLeftStepsCounter() + 1);
+                    Game::showLeftScore(player);
+                    if (player.getLeftHandScore() > 21)
+                    {
+                        cout << "Вы перебрали карты в левой руке" << endl;
+                        flag = false;
+                    }
+                    else if (player.getLeftHandScore() == 21)
+                    {
+                        flag = false;
+                        break;
+                    }
+                    break;
+                case '2':
+                    if (player.getLeftStepsCounter() > 2)
+                        cout << "Введите допустимый вариант" << endl;
+                    else
+                    {
+                        leftHandDouble = true;
+                        Game::DoubleLeft(player, dealer, deck, leftHandDouble);
+                        flag = false;
+                        break;
+                    }
+                    break;
+                case'0':
+                    flag = false;
+                    break;
+                default:
+                    cout << "Введите возможный вариант" << endl;
+                    break;
+                }
+            }
+            flag = true;
+            while (flag) {//right hand
+                flag = true;
+                if(player.getRightStepsCounter() == 2)
+                Game::showRightScore(player);
+                cout << "Хотите добрать карту в правую руку?" << endl;
+                cout << "1 - Да" << endl;
+                if (player.getRightStepsCounter() == 2)
+                    cout << "2 - Дабл(правая рука)" << endl;
+                cout << "0 - Нет" << endl;
+                cin >> choice;
+                switch (choice)
+                {
+                case '1':
+                    player.addRightCards(deck.getRandomCard());
+                    player.setRightStepsCounter(player.getRightStepsCounter() + 1);
+                    cout << "Правая рука:" << endl;
+                    Game::showRightScore(player);
+                    if (player.getRightHandScore() > 21)
+                    {
+                        cout << "Вы перебрали карты в правой руке" << endl;
+                        flag = false;
+                    }
+                    else if (player.getRightHandScore() == 21)
+                    {
+                        flag = false;
+                        break;
+                    }
+                    break;
+                case '2':
+                    if (player.getRightStepsCounter() > 2)
+                        cout << "Введите допустимый вариант" << endl;
+                    else
+                    {
+                        rightHandDouble = true;
+                        Game::DoubleRight(player, dealer, deck, rightHandDouble);
+                        flag = false;
+                        break;
+                    }
+                    break;
+                case'0':
+                    Game::showScore(dealer, "d");
+                    while (dealer.getLeftHandScore() < 17)
+                    {
+                        dealer.addLeftCards(deck.getRandomCard());
+                        Game::showScore(dealer, "d");
+                    }
+                    flag = false;
+                    break;
+                default:
+                    cout << "Введите возможный вариант" << endl;
+                    break;
+                }
+            }
+            Game::isLoss(player, dealer, leftHandDouble, rightHandDouble);
+        }
+    }
+}
     void Player::setNumberOfGames(int inputgames)
     {
         NumberOfGames = inputgames;
@@ -48,9 +184,10 @@
     {
         return MaxScore;
     }
-    void Player::clearHand()
+    void Player::clearHands()
     {
-        hand.clear();
+        Lefthand.clear();
+        RightHand.clear();
     }
     void Player::setChips(int inputChips)
     {
@@ -70,50 +207,21 @@
     }
     void Player::ShowFirstCard()
     {
-        hand[0].showCard();
+        Lefthand[0].showCard();
     }
     int Player::getFirstCardScore()
     {
-        return hand[0].getValue();
+        return Lefthand[0].getValue();
     }
-    void Player::isLoss(Player& player, Player& dealer, bool Double)
+    void Player::showLeftHand()
     {
-        if (player.score > 21)
-            cout << "Игрок перебрал карты, дилер победил" << endl;
-        else if (dealer.score > 21)
-        {
-            cout << "Дилер перебрал карты, игрок победил" << endl;
-            if(Double)
-                player.setChips(player.getChips() + player.getInputChips() * 4);
-            else
-                player.setChips(player.getChips() + player.getInputChips() * 2);
-        }
-        else if (player.score > dealer.score)
-        {
-            cout << "Счёт игрока больше, игрок победил" << endl;
-            if (Double)
-                player.setChips(player.getChips() + player.getInputChips() * 4);
-            else
-                player.setChips(player.getChips() + player.getInputChips() * 2);
-        }
-        else if (player.score < dealer.score)
-        {
-            cout << "Счёт дилера больше, дилер победил" << endl;
-        }
-        else if (player.getScore() == dealer.getScore())
-        {
-            cout << "Ничья!" << endl;
-            if (Double)
-                player.setChips(player.getChips() + player.getInputChips() * 2);
-            else
-                player.setChips(player.getChips() + player.getInputChips());
-
+        for (auto& card : Lefthand) {
+            card.showCard();
         }
     }
-
-    void Player::showHand()
+    void Player::showRightHand()
     {
-        for (auto& card : hand) {
+        for (auto& card : RightHand) {
             card.showCard();
         }
     }
@@ -121,12 +229,15 @@
     {
         cout << "Ваши фишки: " << chips << endl;
     }
-    void Player::addCard(Card card) {
-        hand.push_back(card);
+    void Player::addLeftCards(Card card) {
+        Lefthand.push_back(card);
     }
-    int Player::getScore() {
+    void Player::addRightCards(Card card) {
+        RightHand.push_back(card);
+    }
+    int Player::getLeftHandScore() {
         score = 0;
-        for (auto& elem : hand)
+        for (auto& elem : Lefthand)
         {
             if (elem.getValue() == 11 && score + elem.getValue() > 21)//TODO: Подумать как можно обращаться к карте по ее номиналу
             {
@@ -137,11 +248,36 @@
         }
         return score;
     }
-    void Player::setStepsCounter(int counter)
-    {
-        stepsCounter = counter;
+    int Player::getRightHandScore() {
+        score = 0;
+        for (auto& elem : RightHand)
+        {
+            if (elem.getValue() == 11 && score + elem.getValue() > 21)//TODO: Подумать как можно обращаться к карте по ее номиналу
+            {
+                score += 1;
+            }
+            else
+                score += elem.getValue();
+        }
+        return score;
     }
-    int Player::getStepsCounter()
+    void Player::setLeftStepsCounter(int counter)
     {
-        return stepsCounter;
+        LeftStepsCounter = counter;
+    }
+    int Player::getLeftStepsCounter()
+    {
+        return LeftStepsCounter;
+    }
+    void Player::setRightStepsCounter(int counter)
+    {
+        RightStepsCounter = counter;
+    }
+    int Player::getRightStepsCounter()
+    {
+        return RightStepsCounter;
+    }
+    int Player::SumStepsCounter()
+    {
+        return LeftStepsCounter + RightStepsCounter;
     }
