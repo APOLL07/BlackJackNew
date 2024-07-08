@@ -17,125 +17,139 @@ void Player::Split(Player& player, Player& dealer, Deck& deck)
     }
     if (Split)
     {
-        if (player.getChips() - player.getInputChips() > 0)
-        {
-            bool flag = true;
-            bool leftHandDouble = false;
-            bool rightHandDouble = false;
-            char choice = '0';
-            player.setChips(player.getChips() - player.getInputChips());
-            player.RightHand.push_back(Lefthand[1]);
-            player.setRightStepsCounter(1);
-            player.Lefthand.erase(player.Lefthand.begin() + 1, player.Lefthand.end());
-            player.setLeftStepsCounter(1);
-            player.addLeftCards(deck.getRandomCard());
-            player.setLeftStepsCounter(player.getLeftStepsCounter() + 1);
-            player.addRightCards(deck.getRandomCard());
-            player.setRightStepsCounter(player.getRightStepsCounter() + 1);
-            Game::showLeftScore(player);
-            Game::showRightScore(player);
-            while (flag) { // lefthand
-                flag = true;
-                cout << "Хотите добрать карту в левую руку?" << endl;
-                cout << "1 - Да" << endl;
-                if (player.getLeftStepsCounter() == 2)
-                    cout << "2 - Дабл(левая рука)" << endl;
-                cout << "0 - Нет" << endl;
-                cin >> choice;
-                switch (choice)
-                {
-                case '1':
-                    player.addLeftCards(deck.getRandomCard());
-                    player.setLeftStepsCounter(player.getLeftStepsCounter() + 1);
-                    Game::showLeftScore(player);
-                    if (player.getLeftHandScore() > 21)
+            if (Game::CheckBet(player))
+            {
+                bool flag = true;
+                bool leftHandDouble = false;
+                bool rightHandDouble = false;
+                char choice = '0';
+                player.RightHand.push_back(Lefthand[1]);
+                player.setRightStepsCounter(1);
+                player.Lefthand.erase(player.Lefthand.begin() + 1, player.Lefthand.end());
+                player.setLeftStepsCounter(1);
+                Game::AddCardForPlayer(player, deck, "left");
+                Game::AddCardForPlayer(player, deck, "right");
+                Game::showSplitScore(player, "left");
+                Game::showSplitScore(player, "right");
+                Game::ShowFirstScore(dealer);
+                while (flag) { // lefthand
+                    flag = true;
+                    cout << "Хотите добрать карту в левую руку?" << endl;
+                    cout << "1 - Да" << endl;
+                    if (player.getLeftStepsCounter() == 2)
+                        cout << "2 - Дабл(левая рука)" << endl;
+                    cout << "0 - Нет" << endl;
+                    cin >> choice;
+                    switch (choice)
                     {
-                        cout << "Вы перебрали карты в левой руке" << endl;
-                        flag = false;
-                    }
-                    else if (player.getLeftHandScore() == 21)
-                    {
+                    case '1':
+                        Game::AddCardForPlayer(player, deck, "left");
+                        Game::showSplitScore(player, "left");
+                        if (player.getLeftHandScore() > 21)
+                        {
+                            cout << "Вы перебрали карты в левой руке" << endl;
+                            flag = false;
+                        }
+                        else if (player.getLeftHandScore() == 21)
+                        {
+                            flag = false;
+                            break;
+                        }
+                        break;
+                    case '2':
+                        if (player.getLeftStepsCounter() > 2)
+                            cout << "Введите допустимый вариант" << endl;
+                        else
+                        {
+                            leftHandDouble = true;
+                            Game::DoubleForSplit(player, dealer, deck, "left");
+                            flag = false;
+                            break;
+                        }
+                        break;
+                    case'0':
                         flag = false;
                         break;
-                    }
-                    break;
-                case '2':
-                    if (player.getLeftStepsCounter() > 2)
-                        cout << "Введите допустимый вариант" << endl;
-                    else
-                    {
-                        leftHandDouble = true;
-                        Game::DoubleLeft(player, dealer, deck, leftHandDouble);
-                        flag = false;
+                    default:
+                        cout << "Введите возможный вариант" << endl;
                         break;
                     }
-                    break;
-                case'0':
-                    flag = false;
-                    break;
-                default:
-                    cout << "Введите возможный вариант" << endl;
-                    break;
                 }
-            }
-            flag = true;
-            while (flag) {//right hand
                 flag = true;
-                if(player.getRightStepsCounter() == 2)
-                Game::showRightScore(player);
-                cout << "Хотите добрать карту в правую руку?" << endl;
-                cout << "1 - Да" << endl;
-                if (player.getRightStepsCounter() == 2)
-                    cout << "2 - Дабл(правая рука)" << endl;
-                cout << "0 - Нет" << endl;
-                cin >> choice;
-                switch (choice)
-                {
-                case '1':
-                    player.addRightCards(deck.getRandomCard());
-                    player.setRightStepsCounter(player.getRightStepsCounter() + 1);
-                    cout << "Правая рука:" << endl;
-                    Game::showRightScore(player);
-                    if (player.getRightHandScore() > 21)
+                while (flag) {//right hand
+                    flag = true;
+                    if (player.getRightStepsCounter() == 2)
                     {
-                        cout << "Вы перебрали карты в правой руке" << endl;
-                        flag = false;
+                        Game::showSplitScore(player, "right");
+                        Game::ShowFirstScore(dealer);
                     }
-                    else if (player.getRightHandScore() == 21)
+                    cout << "Хотите добрать карту в правую руку?" << endl;
+                    cout << "1 - Да" << endl;
+                    if (player.getRightStepsCounter() == 2)
+                        cout << "2 - Дабл(правая рука)" << endl;
+                    cout << "0 - Нет" << endl;
+                    cin >> choice;
+                    switch (choice)
                     {
-                        flag = false;
+                    case '1':
+                        Game::AddCardForPlayer(player, deck, "right");
+                        Game::showSplitScore(player, "right");
+                        Game::ShowFirstScore(dealer);
+                        if (player.getRightHandScore() > 21)
+                        {
+                            cout << "Вы перебрали карты в правой руке" << endl;
+                            Game::showScore(dealer, "d");
+                            flag = false;
+                        }
+                        else if (player.getRightHandScore() == 21)
+                        {
+                            Game::showScore(dealer, "d");
+                            Game::DealerAddCards(player, dealer, deck);
+                            flag = false;
+                            break;
+                        }
                         break;
-                    }
-                    break;
-                case '2':
-                    if (player.getRightStepsCounter() > 2)
-                        cout << "Введите допустимый вариант" << endl;
-                    else
-                    {
-                        rightHandDouble = true;
-                        Game::DoubleRight(player, dealer, deck, rightHandDouble);
-                        flag = false;
+                    case '2':
+                        if (player.getRightStepsCounter() > 2)
+                            cout << "Введите допустимый вариант" << endl;
+                        else
+                        {
+                            rightHandDouble = true;
+                            Game::DoubleForSplit(player, dealer, deck, "right");
+                            flag = false;
+                            break;
+                        }
                         break;
-                    }
-                    break;
-                case'0':
-                    Game::showScore(dealer, "d");
-                    while (dealer.getLeftHandScore() < 17)
-                    {
-                        dealer.addLeftCards(deck.getRandomCard());
+                    case'0':
                         Game::showScore(dealer, "d");
+                        Game::DealerAddCards(player, dealer, deck);
+                        flag = false;
+                        break;
+                    default:
+                        cout << "Введите возможный вариант" << endl;
+                        break;
                     }
-                    flag = false;
-                    break;
-                default:
-                    cout << "Введите возможный вариант" << endl;
-                    break;
                 }
+                Game::isLoss(player, dealer, leftHandDouble, rightHandDouble);
             }
-            Game::isLoss(player, dealer, leftHandDouble, rightHandDouble);
-        }
     }
 }
+    void Player::setLoses(int inputLoses)
+    {
+        LosesCounter = inputLoses;
+    }
+    int Player::getLoses()
+    {
+        return LosesCounter;
+    }
+    void Player::setVictorys(int inputVictorys)
+    {
+        VictorysCounter = inputVictorys;
+    }
+    int Player::getVictorys()
+    {
+        return VictorysCounter;
+    }
     void Player::setNumberOfGames(int inputgames)
     {
         NumberOfGames = inputgames;
@@ -168,26 +182,50 @@ void Player::Split(Player& player, Player& dealer, Deck& deck)
     {
         return MaxChips;
     }
-    void Player::setMaxStepsCounter(int inputsteps)
+    void Player::setMaxLeftStepsCounter(int inputsteps)
     {
-        MaxStepsCounter = inputsteps;
+        MaxLeftStepsCounter = inputsteps;
     }
-    int Player::getMaxStepsCounter()
+    int Player::getMaxLeftStepsCounter()
     {
-        return MaxStepsCounter;
+        return MaxLeftStepsCounter;
     }
-    void Player::setMaxScore(int inputscore)
+    void Player::setMaxRightStepsCounter(int inputsteps)
     {
-        MaxScore = inputscore;
+        MaxRightStepsCounter = inputsteps;
     }
-    int Player::getMaxScore()
+    int Player::getMaxRightStepsCounter()
     {
-        return MaxScore;
+        return MaxRightStepsCounter;
+    }
+    void Player::setMaxSumStepsCounter(int inputsteps)
+    {
+        MaxSumStepsCounter = inputsteps;
+    }
+    int Player::getMaxSumStepsCounter()
+    {
+        return MaxSumStepsCounter;
+    }
+    void Player::setCloseWins(int inputWins)
+    {
+        CloseWins = inputWins;
+    }
+    int Player::getCloseWins()
+    {
+        return CloseWins;
     }
     void Player::clearHands()
     {
         Lefthand.clear();
         RightHand.clear();
+    }
+    int Player::getDrawsCounter()
+    {
+        return DrawsCounter;
+    }
+    void Player::setDrawsCounter(int inputCounter)
+    {
+        DrawsCounter = inputCounter;
     }
     void Player::setChips(int inputChips)
     {

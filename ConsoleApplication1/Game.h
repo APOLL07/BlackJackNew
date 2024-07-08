@@ -11,16 +11,19 @@ public:
 
     static void startGame(Player& player, Player& dealer, Deck& deck);
     static void showScore(Player& player, string Name);
-    static void DoubleLeft(Player& player, Player& dealer, Deck &deck, bool Double);
-    static void DoubleRight(Player& player, Player& dealer, Deck &deck, bool Double);
+    static void Double(Player& player, Player& dealer, Deck &deck);
+    static void DoubleForSplit(Player& player, Player& dealer, Deck& deck, string choiseHand);
     static void ShowStatistic(Player& player);
-    static void showRightScore(Player& player);
-    static void showLeftScore(Player& player);
+    static void showSplitScore(Player& player, string choiseHand);
+    static void ShowFirstScore(Player& dealer);
+    static void CheckDraw(Player& player, bool Double);
+    static void CheckWin(Player& player, bool Double);
+    static bool CheckBet(Player& player);
+    static void DealerAddCards(Player &player, Player& dealer, Deck &deck);
+    static void checkCloseWins(Player& player, Player& dealer);
     static bool CheckBlackJack(Player& player, Player& dealer, bool flag2);
     static void isLoss(Player& player, Player& dealer, bool Double);
-    //static void isLossLeft(Player& player, Player& dealer, bool Double);
-    //static void isLossRight(Player& player, Player& dealer, bool Double);
     static void isLoss(Player& player, Player& dealer, bool Double, bool Double1);
-    //void Split(Player& player);
+    static void AddCardForPlayer(Player& player, Deck& deck, string choiseHand);
 };
 #endif

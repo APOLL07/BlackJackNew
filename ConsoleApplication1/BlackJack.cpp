@@ -71,13 +71,21 @@ int main()
                 switch (choise)
                 {
                 case'1':
-                    player.addLeftCards(deck.getRandomCard());
-                    player.setLeftStepsCounter(player.getLeftStepsCounter() + 1);
+                    Game::AddCardForPlayer(player, deck, "left");
                     Game::showScore(player, "p");
                     if (player.getLeftHandScore() > 21)
                     {
+                        Game::showScore(dealer, "d");
                         cout << "Вы перебрали карты, дилер победил" << endl;
                         flag2 = false;
+                    }
+                    else if (player.getLeftHandScore() == 21)
+                    {
+                        Game::showScore(dealer, "d");
+                        Game::DealerAddCards(player, dealer, deck);
+                        Game::isLoss(player, dealer, Double);
+                        flag2 = false;
+                        break;
                     }
                     break;
                 case'2':
@@ -86,12 +94,7 @@ int main()
                     else
                     {
                         Double = true;
-                        Game::DoubleLeft(player, dealer, deck, Double);
-                        while (dealer.getLeftHandScore() < 17)
-                        {
-                            dealer.addLeftCards(deck.getRandomCard());
-                            Game::showScore(dealer, "d");
-                        }
+                        Game::Double(player, dealer, deck);
                         Game::isLoss(player, dealer, Double);
                         flag2 = false;
                         break;
@@ -102,11 +105,7 @@ int main()
                        break;
                 case'0':
                     Game::showScore(dealer, "d");
-                    while (dealer.getLeftHandScore() < 17)
-                    {
-                        dealer.addLeftCards(deck.getRandomCard());
-                        Game::showScore(dealer, "d");
-                    }
+                    Game::DealerAddCards(player, dealer, deck);
                     Game::isLoss(player, dealer, Double);
                     flag2 = false;
                     break;
@@ -130,12 +129,13 @@ int main()
             cout << "Введите возможный вариант" << endl;
             break;
         }
-        if (player.SumStepsCounter() > player.getMaxStepsCounter())
-            player.setMaxStepsCounter(player.SumStepsCounter());
-        if (player.getLeftHandScore() > player.getMaxScore())
-            player.setMaxScore(player.getLeftHandScore());
+        if (player.getLeftStepsCounter() > player.getMaxLeftStepsCounter())
+            player.setMaxLeftStepsCounter(player.getLeftStepsCounter());
+        if (player.getRightStepsCounter() > player.getMaxRightStepsCounter())
+            player.setMaxRightStepsCounter(player.getMaxLeftStepsCounter());
+        if (player.getMaxLeftStepsCounter() + player.getMaxRightStepsCounter() > player.getMaxSumStepsCounter())
+            player.setMaxSumStepsCounter(player.getMaxLeftStepsCounter() + player.getMaxRightStepsCounter());
         if (player.getChips() > player.getMaxChips())
             player.setMaxChips(player.getChips());
-        player.setNumberOfGames(player.getNumberOfGames() + 1);
     }
 }
