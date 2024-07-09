@@ -21,7 +21,7 @@ public:
     static bool CheckBet(Player& player);
     static void DealerAddCards(Player &player, Player& dealer, Deck &deck);
     static void checkCloseWins(Player& player, Player& dealer);
-    static bool CheckBlackJack(Player& player, Player& dealer, bool flag2);
+    static bool CheckBlackJack(Player& player, Player& dealer);
     static void isLoss(Player& player, Player& dealer, bool Double);
     static void isLoss(Player& player, Player& dealer, bool Double, bool Double1);
     static void AddCardForPlayer(Player& player, Deck& deck, string choiseHand);

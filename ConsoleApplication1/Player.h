@@ -24,24 +24,24 @@ class Player {
     int NumberOfGames = 0;
     int DrawsCounter = 0;
 public:
-    void setVictorys(int inputVictorys);
-    int getVictorys();
-    void setLoses(int inputLoses);
-    int getLoses();
-    void setCloseWins(int inputWins);
-    int getCloseWins();
+    void addVictorys();
+    int  getVictorys();
+    void addLoses();
+    int  getLoses();
+    void addCloseWins();
+    int  getCloseWins();
     bool CheckOnSplit(Player &player);
     void Split(Player& player, Player& dealer, Deck& deck);
-    void setNumberOfGames(int inputgames);
-    int getNumberOfGames();
-    void setVictorysByBlackJack(int inputVictorys);
+    void addNumberOfGames();
+    int  getNumberOfGames();
+    void addVictorysByBlackJack();
     int  getVictorysByBlackJack();
-    void setLoosesByBlackJack(int inputLooses);
+    void addLoosesByBlackJack();
     int  getLoosesByBlackJack();
     void setMaxChips(int inputChips);
     int  getMaxChips();
-    int getDrawsCounter();
-    void setDrawsCounter(int inputCounter);
+    int  getDrawsCounter();
+    void addDrawsCounter();
     void setMaxLeftStepsCounter(int inputsteps);
     int  getMaxLeftStepsCounter();
     void setMaxSumStepsCounter(int inputsteps);
@@ -66,9 +66,8 @@ public:
     void setRightStepsCounter(int counter);
     int  getLeftStepsCounter();
     int  getRightStepsCounter();
-    int SumStepsCounter();
-
+    int  SumStepsCounter();
     void writeStatistics(string S) const;
-    void ReadStatistics(istream& f);
+    void ReadStatistics(string S);
 };
 #endif

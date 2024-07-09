@@ -14,47 +14,47 @@
     string Card::getRank()
     {
         if (rank == TWO)
-            return "TWO";
+            return "Два";
         if (rank == THREE)
-            return "THREE";
+            return "Три";
         if (rank == FOUR)
-            return "FOUR";
+            return "Четыре";
         if (rank == FIVE)
-            return "FIVE";
+            return "Пять";
         if (rank == SIX)
-            return "SIX";
+            return "Шесть";
         if (rank == SEVEN)
-            return "SEVEN";
+            return "Семь";
         if (rank == EIGHT)
-            return "EIGHT";
+            return "Восемь";
         if (rank == NINE)
-            return "NINE";
+            return "Девять";
         if (rank == TEN)
-            return "TEN";
+            return "Десять";
         if (rank == JACK)
-            return "JACK";
+            return "Валет";
         if (rank == QUEEN)
-            return "QUEEN";
+            return "Королева";
         if (rank == KING)
-            return "KING";
+            return "Король";
         if (rank == ACE)
-            return "ACE";
+            return "Туз";
     }
 
     string Card::getSuit()
     {
         if (suit == CLUBS)
-            return "Clubs";
+            return "Трефы";
         if (suit == DIAMONDS)
-            return "Diamonds";
+            return "Бубны";
         if (suit == HEARTS)
-            return "Hearts";
-        return "Spades";
+            return "Черви";
+        return "Пики";
     }
     void Card::setValue(int inputValue)
     {
         rank = inputValue;
     }
     void Card::showCard() {
-        cout << getRank() << " of " << getSuit() << " (" << getValue() << ") ";
+        cout << getRank() << " " << getSuit() << "|";
     }

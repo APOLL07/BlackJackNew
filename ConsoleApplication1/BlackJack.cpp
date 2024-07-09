@@ -1,60 +1,6 @@
 ﻿
 #include "Game.h"
 #include <fstream>
-void SaveStatisticToFile(Player& player, const string& filename)
-{
-    ofstream outFile(filename, ios::binary);
-    if (!outFile.is_open())
-    {
-        cerr << "Ошибка при открытии файла для записи." << endl;
-        return;
-    }
-    else
-    {
-        int maxLeftStepsCounter = player.getMaxLeftStepsCounter();
-        outFile.write((char*)(&maxLeftStepsCounter), sizeof(int));
-        //outFile.write((char*)player.getMaxLeftStepsCounter(), sizeof(int));
-        //outFile.write((char*)player.getMaxRightStepsCounter(), sizeof(int));
-        //outFile.write((char*)player.getMaxSumStepsCounter(), sizeof(int));
-        //outFile.write((char*)player.getMaxChips(), sizeof(int));
-        //outFile.write((char*)player.getVictorys(), sizeof(int));
-        //outFile.write((char*)player.getLoses(), sizeof(int));
-        //outFile.write((char*)player.getDrawsCounter(), sizeof(int));
-        //outFile.write((char*)player.getVictorysByBlackJack(), sizeof(int));
-        //outFile.write((char*)player.getLoosesByBlackJack(), sizeof(int));
-        //outFile.write((char*)player.getCloseWins(), sizeof(int));
-        //outFile.write((char*)player.getNumberOfGames(), sizeof(int));
-    }
-        outFile.close();
-}
-void LoadStatisticFromFile(Player& player, const std::string& filename)
-{
-    std::ifstream inFile(filename, std::ios::binary);
-    if (!inFile.is_open())
-    {
-        std::cerr << "Ошибка при открытии файла для чтения." << std::endl;
-        return;
-    }
-
-    // Читаем данные из файла
-    int maxLeftStepsCounter;
-    inFile.read(reinterpret_cast<char*>(&maxLeftStepsCounter), sizeof(int));
-    player.setMaxLeftStepsCounter(maxLeftStepsCounter);
-    //inFile.read((char*)player.getMaxLeftStepsCounter(), sizeof(int));
-    //inFile.read((char*)player.getMaxRightStepsCounter(), sizeof(int));
-    //inFile.read((char*)player.getMaxSumStepsCounter(), sizeof(int));
-    //inFile.read((char*)player.getMaxChips(), sizeof(int));
-    //inFile.read((char*)player.getVictorys(), sizeof(int));
-    //inFile.read((char*)player.getLoses(), sizeof(int));
-    //inFile.read((char*)player.getDrawsCounter(), sizeof(int));
-    //inFile.read((char*)player.getVictorysByBlackJack(), sizeof(int));
-    //inFile.read((char*)player.getLoosesByBlackJack(), sizeof(int));
-    //inFile.read((char*)player.getCloseWins(), sizeof(int));
-    //inFile.read((char*)player.getNumberOfGames(), sizeof(int));
-    // ... продолжайте для остальных полей статистики
-
-    inFile.close();
-}
 int main()
 {
     setlocale(LC_ALL, "Ru");
@@ -64,7 +10,7 @@ int main()
     bool flag = true;
     bool flag2 = true;
     bool Double = false;
-    char choise = '0';
+    int choise = 0;
     int stavka;
     Player player;
     Player dealer;
@@ -77,15 +23,16 @@ int main()
         cout << "2 - Посмотреть баланс" << endl;
         cout << "3 - Посмотреть статистику" << endl;
         cout << "0 - Выйти" << endl;
+        if (player.getChips() == 0)
+        {
+            cout << "Ваш баланс был пополнен на 20 фишек, приятной игры!" << endl;
+            player.setChips(20);
+        }
         cin >> choise;
+        cin.ignore();
         switch (choise)
         {
-        case'1':
-            if (player.getChips() == 0)
-            {
-                cout << "Ваш баланс был пополнен на 20 фишек, приятной игры!" << endl;
-                player.setChips(20);
-            }
+        case 1:
             cout << "Сделайте ставку" << endl;
             cin >> stavka;
             player.setInputChips(stavka);
@@ -112,7 +59,7 @@ int main()
             Game::startGame(player, dealer, deck);
             while (flag2)
             {
-                if (Game::CheckBlackJack(player, dealer, flag2))
+                if (Game::CheckBlackJack(player, dealer))
                 {
                     flag2 = false;
                     break;
@@ -127,14 +74,13 @@ int main()
                 cin >> choise;
                 switch (choise)
                 {
-                case'1':
+                case 1:
                     Game::AddCardForPlayer(player, deck, "left");
                     Game::showScore(player, "p");
                     if (player.getLeftHandScore() > 21)
                     {
                         Game::showScore(dealer, "d");
                         cout << "Вы перебрали карты, дилер победил" << endl;
-                        player.setNumberOfGames(player.getNumberOfGames() + 1);
                         flag2 = false;
                     }
                     else if (player.getLeftHandScore() == 21)
@@ -146,22 +92,26 @@ int main()
                         break;
                     }
                     break;
-                case'2':
+                case 2:
                     if (player.getLeftStepsCounter() != 2)
                         cout << "Введите допустимый вариант" << endl;
                     else
                     {
                         Double = true;
                         Game::Double(player, dealer, deck);
-                         //Game::isLoss(player, dealer, Double);
                         flag2 = false;
                         break;
                     }
-                case'3':
+                case 3:
+                    if (player.getLeftStepsCounter() != 2 && !player.CheckOnSplit(player))
+                        cout << "Введите допустимый вариант" << endl;
+                    else
+                    {
                         player.Split(player, dealer, deck);
                         flag2 = false;
+                    }
                        break;
-                case'0':
+                case 0:
                     Game::showScore(dealer, "d");
                     Game::DealerAddCards(player, dealer, deck);
                     Game::isLoss(player, dealer, Double);
@@ -172,6 +122,7 @@ int main()
                     break;
                 }
             }
+            player.addNumberOfGames();
             if (player.getLeftStepsCounter() > player.getMaxLeftStepsCounter())
                 player.setMaxLeftStepsCounter(player.getLeftStepsCounter());
             if (player.getRightStepsCounter() > player.getMaxRightStepsCounter())
@@ -180,20 +131,17 @@ int main()
                 player.setMaxSumStepsCounter(player.getMaxLeftStepsCounter() + player.getMaxRightStepsCounter());
             if (player.getChips() > player.getMaxChips())
                 player.setMaxChips(player.getChips());           
-      
             player.writeStatistics(S); 
 
             break;
-        case'2':
+        case 2:
             player.showChips();
             break;
-        case'3':
-            in.open(S, ios::binary);
-            player.ReadStatistics(in);
-            in.close();
+        case 3:
+            player.ReadStatistics(S);
             Game::ShowStatistic(player);
             break;
-        case'0':
+        case 0:
             cout << "До Свидания!" << endl;
             flag = false;
             break;
@@ -203,4 +151,5 @@ int main()
         }
 
     }
+    system("pause");
 }
