@@ -67,5 +67,8 @@ public:
     int  getLeftStepsCounter();
     int  getRightStepsCounter();
     int SumStepsCounter();
+
+    void writeStatistics(string S) const;
+    void ReadStatistics(istream& f);
 };
 #endif

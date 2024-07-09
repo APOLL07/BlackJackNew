@@ -12,7 +12,7 @@ void SaveStatisticToFile(Player& player, const string& filename)
     else
     {
         int maxLeftStepsCounter = player.getMaxLeftStepsCounter();
-        outFile.write(reinterpret_cast<char*>(&maxLeftStepsCounter), sizeof(int));
+        outFile.write((char*)(&maxLeftStepsCounter), sizeof(int));
         //outFile.write((char*)player.getMaxLeftStepsCounter(), sizeof(int));
         //outFile.write((char*)player.getMaxRightStepsCounter(), sizeof(int));
         //outFile.write((char*)player.getMaxSumStepsCounter(), sizeof(int));
@@ -59,6 +59,8 @@ int main()
 {
     setlocale(LC_ALL, "Ru");
     string S = "PlayerStatistic.txt";
+    ofstream out;
+    ifstream in;
     bool flag = true;
     bool flag2 = true;
     bool Double = false;
@@ -151,7 +153,7 @@ int main()
                     {
                         Double = true;
                         Game::Double(player, dealer, deck);
-                        Game::isLoss(player, dealer, Double);
+                         //Game::isLoss(player, dealer, Double);
                         flag2 = false;
                         break;
                     }
@@ -170,13 +172,25 @@ int main()
                     break;
                 }
             }
-            SaveStatisticToFile(player, S);
+            if (player.getLeftStepsCounter() > player.getMaxLeftStepsCounter())
+                player.setMaxLeftStepsCounter(player.getLeftStepsCounter());
+            if (player.getRightStepsCounter() > player.getMaxRightStepsCounter())
+                player.setMaxRightStepsCounter(player.getMaxLeftStepsCounter());
+            if (player.getMaxLeftStepsCounter() + player.getMaxRightStepsCounter() > player.getMaxSumStepsCounter())
+                player.setMaxSumStepsCounter(player.getMaxLeftStepsCounter() + player.getMaxRightStepsCounter());
+            if (player.getChips() > player.getMaxChips())
+                player.setMaxChips(player.getChips());           
+      
+            player.writeStatistics(S); 
+
             break;
         case'2':
             player.showChips();
             break;
         case'3':
-            LoadStatisticFromFile(player, S);
+            in.open(S, ios::binary);
+            player.ReadStatistics(in);
+            in.close();
             Game::ShowStatistic(player);
             break;
         case'0':
@@ -187,13 +201,6 @@ int main()
             cout << "Введите возможный вариант" << endl;
             break;
         }
-        if (player.getLeftStepsCounter() > player.getMaxLeftStepsCounter())
-            player.setMaxLeftStepsCounter(player.getLeftStepsCounter());
-        if (player.getRightStepsCounter() > player.getMaxRightStepsCounter())
-            player.setMaxRightStepsCounter(player.getMaxLeftStepsCounter());
-        if (player.getMaxLeftStepsCounter() + player.getMaxRightStepsCounter() > player.getMaxSumStepsCounter())
-            player.setMaxSumStepsCounter(player.getMaxLeftStepsCounter() + player.getMaxRightStepsCounter());
-        if (player.getChips() > player.getMaxChips())
-            player.setMaxChips(player.getChips());
+
     }
 }

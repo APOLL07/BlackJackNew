@@ -1,11 +1,45 @@
 #include "Player.h"
 #include "Game.h"
+#include <fstream>
 bool Player::CheckOnSplit(Player &player)
 {
     for (int i = 0; i < Lefthand.size() - 1;i++)
     {
         return Lefthand[i].getRank() == Lefthand[i + 1].getRank();
     }
+}
+void Player::writeStatistics(string S) const
+{
+    ofstream f("PlayerStatistic.txt", ios::binary);
+   /* cout << "DEBUG:" << NumberOfGames << endl;
+    int test = 10022;
+    f.write((const char*)&test, sizeof(int));*/    
+    f.write((const char*)&MaxLeftStepsCounter, sizeof(int));
+    f.write((const char*)&MaxRightStepsCounter, sizeof(int));
+    f.write((const char*)&MaxSumStepsCounter, sizeof(int));
+    f.write((const char*)&MaxChips, sizeof(int));
+    f.write((const char*)&VictorysCounter, sizeof(int));
+    f.write((const char*)&LosesCounter, sizeof(int));
+    f.write((const char*)&VictorysByBlackJack, sizeof(int));
+    f.write((const char*)&CloseWins, sizeof(int));
+    f.write((const char*)&NumberOfGames, sizeof(int));
+    f.write((const char*)&DrawsCounter, sizeof(int));
+    f.write((const char*)&LoosesByBlackJack, sizeof(int));
+    f.close();
+}
+void Player::ReadStatistics(istream& f)
+{
+    f.read((char*)&MaxLeftStepsCounter, sizeof(int));
+    f.read((char*)&MaxRightStepsCounter, sizeof(int));
+    f.read((char*)&MaxSumStepsCounter, sizeof(int));
+    f.read((char*)&MaxChips, sizeof(int));
+    f.read((char*)&VictorysCounter, sizeof(int));
+    f.read((char*)&LosesCounter, sizeof(int));
+    f.read((char*)&VictorysByBlackJack, sizeof(int));
+    f.read((char*)&CloseWins, sizeof(int));
+    f.read((char*)&NumberOfGames, sizeof(int));
+    f.read((char*)&DrawsCounter, sizeof(int));
+    f.read((char*)&LoosesByBlackJack, sizeof(int));
 }
 void Player::Split(Player& player, Player& dealer, Deck& deck)
 {
