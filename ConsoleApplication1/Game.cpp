@@ -142,11 +142,11 @@
     //    }
     //}
         void Game::ShowStatistic(Player& player)
-    {
+        {
         if (player.getNumberOfGames() == 0)
             cout << "У Вас ещё нету статистики, сыграйте 1 игру, чтобы смотреть свою статистику" << endl;
-        else
-        {
+             else
+            {
             cout << "Максимальное число карт в левой руке:                        " << player.getMaxLeftStepsCounter() << endl;
             cout << "Максимальное число карт в правой руке:                       " << player.getMaxRightStepsCounter() << endl;
             cout << "Максимальное число карт в двух руках :                       " << player.getMaxSumStepsCounter() << endl;
@@ -158,8 +158,8 @@
             cout << "Количество поражений из-за Блекджека:                        " << player.getLoosesByBlackJack() << endl;
             cout << "Количество игр на волоске(у игрока счёт на 1 больше дилера): " << player.getCloseWins() << endl;
             cout << "Количество сыгранных игр:                                    " << player.getNumberOfGames() << endl;
+            }
         }
-    }
     void Game::isLoss(Player& player, Player& dealer, bool Double)
     {
         player.setNumberOfGames(player.getNumberOfGames() + 1);

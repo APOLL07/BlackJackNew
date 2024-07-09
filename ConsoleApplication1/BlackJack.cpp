@@ -1,9 +1,64 @@
 ﻿
 #include "Game.h"
+#include <fstream>
+void SaveStatisticToFile(Player& player, const string& filename)
+{
+    ofstream outFile(filename, ios::binary);
+    if (!outFile.is_open())
+    {
+        cerr << "Ошибка при открытии файла для записи." << endl;
+        return;
+    }
+    else
+    {
+        int maxLeftStepsCounter = player.getMaxLeftStepsCounter();
+        outFile.write(reinterpret_cast<char*>(&maxLeftStepsCounter), sizeof(int));
+        //outFile.write((char*)player.getMaxLeftStepsCounter(), sizeof(int));
+        //outFile.write((char*)player.getMaxRightStepsCounter(), sizeof(int));
+        //outFile.write((char*)player.getMaxSumStepsCounter(), sizeof(int));
+        //outFile.write((char*)player.getMaxChips(), sizeof(int));
+        //outFile.write((char*)player.getVictorys(), sizeof(int));
+        //outFile.write((char*)player.getLoses(), sizeof(int));
+        //outFile.write((char*)player.getDrawsCounter(), sizeof(int));
+        //outFile.write((char*)player.getVictorysByBlackJack(), sizeof(int));
+        //outFile.write((char*)player.getLoosesByBlackJack(), sizeof(int));
+        //outFile.write((char*)player.getCloseWins(), sizeof(int));
+        //outFile.write((char*)player.getNumberOfGames(), sizeof(int));
+    }
+        outFile.close();
+}
+void LoadStatisticFromFile(Player& player, const std::string& filename)
+{
+    std::ifstream inFile(filename, std::ios::binary);
+    if (!inFile.is_open())
+    {
+        std::cerr << "Ошибка при открытии файла для чтения." << std::endl;
+        return;
+    }
 
+    // Читаем данные из файла
+    int maxLeftStepsCounter;
+    inFile.read(reinterpret_cast<char*>(&maxLeftStepsCounter), sizeof(int));
+    player.setMaxLeftStepsCounter(maxLeftStepsCounter);
+    //inFile.read((char*)player.getMaxLeftStepsCounter(), sizeof(int));
+    //inFile.read((char*)player.getMaxRightStepsCounter(), sizeof(int));
+    //inFile.read((char*)player.getMaxSumStepsCounter(), sizeof(int));
+    //inFile.read((char*)player.getMaxChips(), sizeof(int));
+    //inFile.read((char*)player.getVictorys(), sizeof(int));
+    //inFile.read((char*)player.getLoses(), sizeof(int));
+    //inFile.read((char*)player.getDrawsCounter(), sizeof(int));
+    //inFile.read((char*)player.getVictorysByBlackJack(), sizeof(int));
+    //inFile.read((char*)player.getLoosesByBlackJack(), sizeof(int));
+    //inFile.read((char*)player.getCloseWins(), sizeof(int));
+    //inFile.read((char*)player.getNumberOfGames(), sizeof(int));
+    // ... продолжайте для остальных полей статистики
+
+    inFile.close();
+}
 int main()
 {
     setlocale(LC_ALL, "Ru");
+    string S = "PlayerStatistic.txt";
     bool flag = true;
     bool flag2 = true;
     bool Double = false;
@@ -77,6 +132,7 @@ int main()
                     {
                         Game::showScore(dealer, "d");
                         cout << "Вы перебрали карты, дилер победил" << endl;
+                        player.setNumberOfGames(player.getNumberOfGames() + 1);
                         flag2 = false;
                     }
                     else if (player.getLeftHandScore() == 21)
@@ -114,11 +170,13 @@ int main()
                     break;
                 }
             }
+            SaveStatisticToFile(player, S);
             break;
         case'2':
             player.showChips();
             break;
         case'3':
+            LoadStatisticFromFile(player, S);
             Game::ShowStatistic(player);
             break;
         case'0':
