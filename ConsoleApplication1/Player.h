@@ -69,5 +69,7 @@ public:
     int  SumStepsCounter();
     void writeStatistics(string S) const;
     void ReadStatistics(string S);
+    //void writeChipsStatistic(string S) const;
+    //void readChipsStatistic(string S);
 };
 #endif

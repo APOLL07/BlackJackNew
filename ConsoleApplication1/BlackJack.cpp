@@ -9,6 +9,7 @@ int main()
     ifstream in;
     bool flag = true;
     bool flag2 = true;
+    bool flag3 = true;
     bool Double = false;
     int choise = 0;
     int stavka;
@@ -16,25 +17,28 @@ int main()
     Player dealer;
     Deck deck;
     cout << "Добро пожаловать в БлэкДжэк!" << endl;
+    player.ReadStatistics(S);
     while (flag)
     {
+        if (player.getChips() == 0)
+        {
+            cout << "Похоже, Вы всё проиграли( загляните в Ваш баланс, возможно, есть варианты отыграться?" << endl;
+        }
         cout << "Выберите действие" << endl;
         cout << "1 - Начать игру" << endl;
         cout << "2 - Посмотреть баланс" << endl;
         cout << "3 - Посмотреть статистику" << endl;
         cout << "0 - Выйти" << endl;
-        if (player.getChips() == 0)
-        {
-            cout << "Ваш баланс был пополнен на 20 фишек, приятной игры!" << endl;
-            player.setChips(20);
-        }
         cin >> choise;
-        cin.ignore();
         switch (choise)
         {
         case 1:
             cout << "Сделайте ставку" << endl;
+            cout << "Текущие фишки:" << player.getChips() << endl;
+            cout <<  "0 - Отменить ставку" << endl;
             cin >> stavka;
+            if (stavka == 0)
+                break;
             player.setInputChips(stavka);
             while (player.getInputChips() > player.getChips() || player.getInputChips() % 5 != 0 || player.getInputChips() == 0)
             {
@@ -42,10 +46,12 @@ int main()
                     cout << "У Вас на балансе недостаточно фишек" << endl;
                 else if (player.getInputChips() % 5 != 0)
                     cout << "Ваша ставка должна быть кратна 5" << endl;
-                else if (player.getInputChips() == 0)
-                    cout << "Ставка не может равняться 0 фишек" << endl;
                 cout << "Сделайте ставку" << endl;
+                cout << "Текущие фишки:" << player.getChips() << endl;
+                cout << "0 - Отменить ставку" << endl;
                 cin >> stavka;
+                if (stavka == 0)
+                    break;
                 player.setInputChips(stavka);
             }
             cout << "Ставка принята!" << endl;
@@ -93,24 +99,27 @@ int main()
                     }
                     break;
                 case 2:
-                    if (player.getLeftStepsCounter() != 2)
+                    if (player.getLeftStepsCounter() > 2)
                         cout << "Введите допустимый вариант" << endl;
-                    else
+                    else if (Game::CheckBet(player))
                     {
                         Double = true;
                         Game::Double(player, dealer, deck);
+                        Game::isLoss(player, dealer, Double);
                         flag2 = false;
                         break;
                     }
+                    break;
                 case 3:
                     if (player.getLeftStepsCounter() != 2 && !player.CheckOnSplit(player))
                         cout << "Введите допустимый вариант" << endl;
-                    else
+                    else if (Game::CheckBet(player))
                     {
                         player.Split(player, dealer, deck);
                         flag2 = false;
+                        break;
                     }
-                       break;
+                     break;
                 case 0:
                     Game::showScore(dealer, "d");
                     Game::DealerAddCards(player, dealer, deck);
@@ -122,7 +131,6 @@ int main()
                     break;
                 }
             }
-            player.addNumberOfGames();
             if (player.getLeftStepsCounter() > player.getMaxLeftStepsCounter())
                 player.setMaxLeftStepsCounter(player.getLeftStepsCounter());
             if (player.getRightStepsCounter() > player.getMaxRightStepsCounter())
@@ -130,12 +138,41 @@ int main()
             if (player.getMaxLeftStepsCounter() + player.getMaxRightStepsCounter() > player.getMaxSumStepsCounter())
                 player.setMaxSumStepsCounter(player.getMaxLeftStepsCounter() + player.getMaxRightStepsCounter());
             if (player.getChips() > player.getMaxChips())
-                player.setMaxChips(player.getChips());           
+                player.setMaxChips(player.getChips());   
             player.writeStatistics(S); 
-
             break;
         case 2:
             player.showChips();
+            if (player.getChips() < 20)
+                flag3 = true;
+            while (flag3)
+            {
+                cout << "Желаете пополнить баланс?" << endl;
+                cout << "1 - Да" << endl;
+                cout << "0 - Нет" << endl;
+                cin >> choise;
+                switch (choise)
+                {
+                case 1:
+                    if (player.getChips() >= 20)
+                        cout << "В этом нет необходимости, у Вас достаточно фишек" << endl;
+                    else
+                    {
+                        cout << "Ваш баланс пополнен, приятной игры!" << endl;
+                        player.setChips(20);
+                        player.writeStatistics(S);
+                        flag3 = false;
+                    }
+                    break;
+                case 0:
+                    cout << "Приятной игры!" << endl;
+                    flag3 = false;
+                    break;
+                default:
+                    cout << "Введите возможный вариант" << endl;
+                    break;
+                }
+            }
             break;
         case 3:
             player.ReadStatistics(S);
@@ -149,7 +186,6 @@ int main()
             cout << "Введите возможный вариант" << endl;
             break;
         }
-
     }
     system("pause");
 }

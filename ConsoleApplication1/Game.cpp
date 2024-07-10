@@ -74,8 +74,6 @@
     }
     void Game::Double(Player& player,Player &dealer, Deck &deck)
     {
-        if (CheckBet(player))
-        {
             AddCardForPlayer(player, deck, "left");
             showScore(player, "p");
             showScore(dealer, "d");
@@ -84,14 +82,12 @@
                 dealer.addLeftCards(deck.getRandomCard());
                 showScore(dealer, "d");
             }
-            isLoss(player, dealer, Double);
-        }
     }
     bool Game::CheckBet(Player& player)
     {
         if (player.getChips() - player.getInputChips() < 0)
         {
-            cout << "Нельзя сделать дабл, баланс не может быть меньше 0 фишек" << endl;
+            cout << "Нельзя выполнить действие, баланс не может быть меньше 0 фишек" << endl;
             return false;
         }
         else
@@ -125,22 +121,23 @@
             cout << "У Вас ещё нету статистики, сыграйте 1 игру, чтобы смотреть свою статистику" << endl;
              else
             {
-            cout << "Максимальное число карт в левой руке:                        " << player.getMaxLeftStepsCounter() << endl;
             cout << "Максимальное число карт в правой руке:                       " << player.getMaxRightStepsCounter() << endl;
-            cout << "Максимальное число карт в двух руках :                       " << player.getMaxSumStepsCounter() << endl;
+            cout << "Максимальное число карт в левой руке:                        " << player.getMaxLeftStepsCounter() << endl;
+            cout << "Максимальное число карт в двух руках:                        " << player.getMaxSumStepsCounter() << endl;
             cout << "Максимальное количество фишек:                               " << player.getMaxChips() << endl;
             cout << "Текущее количество фишек:                                    " << player.getChips() << endl;
-            cout << "Количество побед:                                            " << player.getVictorys()<< endl;
             cout << "Количество поражений:                                        " << player.getLoses()<< endl;
+            cout << "Количество побед:                                            " << player.getVictorys() << endl;
             cout << "Количество ничьих:                                           " << player.getDrawsCounter()<< endl;
+            cout << "Количество сыгранных игр:                                    " << player.getNumberOfGames() << endl;
             cout << "Количество побед Блекджеком:                                 " << player.getVictorysByBlackJack() << endl;
             cout << "Количество поражений из-за Блекджека:                        " << player.getLoosesByBlackJack() << endl;
             cout << "Количество игр на волоске(у игрока счёт на 1 больше дилера): " << player.getCloseWins() << endl;
-            cout << "Количество сыгранных игр:                                    " << player.getNumberOfGames() << endl;
             }
         }
     void Game::isLoss(Player& player, Player& dealer, bool Double)
     {
+        player.addNumberOfGames();
         if (player.getLeftHandScore() > 21)
         {
             cout << "Игрок перебрал карты, дилер победил" << endl;
@@ -194,6 +191,7 @@
     }
     void Game::isLoss(Player& player, Player& dealer, bool Double, bool Double1)
     {
+        player.addNumberOfGames();
         if (player.getLeftHandScore() > 21 && player.getRightHandScore() > 21)
         {
             cout << "Игрок Перебрал карты, дилер победил" << endl;
@@ -205,6 +203,12 @@
             player.addVictorys();
             CheckWin(player, Double);
             CheckWin(player, Double1);
+        }
+        else if (player.getLeftHandScore() > 21 && player.getRightHandScore() < dealer.getLeftHandScore()
+               ||player.getRightHandScore() > 21 && player.getLeftHandScore() < dealer.getLeftHandScore())
+        {
+            cout << "Игрок проиграл" << endl;
+            player.addLoses();
         }
         else if (player.getLeftHandScore() > dealer.getLeftHandScore() && player.getRightHandScore() < dealer.getLeftHandScore()
             || player.getLeftHandScore() > dealer.getLeftHandScore() && player.getRightHandScore() > 21)//Win Left, Loose Right

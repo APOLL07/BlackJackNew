@@ -3,7 +3,7 @@
     {
         random_device rd;
         mt19937 rand(rd());
-        uniform_int_distribution<> dist(Start, End);
+        uniform_int_distribution<> dist(4, 6);
         return dist(rand);
     }
     Deck::Deck() {

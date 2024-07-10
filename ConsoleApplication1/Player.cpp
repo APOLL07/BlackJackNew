@@ -5,6 +5,18 @@ bool Player::CheckOnSplit(Player &player)
 {
         return Lefthand[0].getRank() == Lefthand[1].getRank();
 }
+//void Player::writeChipsStatistic(string S) const
+//{
+//    ofstream f(S, ios::binary);
+//    f.write((const char*)&chips, sizeof(int));
+//    f.close();
+//}
+//void Player::readChipsStatistic(string S)
+//{
+//    ifstream f(S, ios::binary);
+//    f.read((char*)&chips, sizeof(int));
+//    f.close();
+//}
 void Player::writeStatistics(string S) const
 {
     ofstream f(S, ios::binary);
@@ -20,31 +32,34 @@ void Player::writeStatistics(string S) const
     f.write((const char*)&DrawsCounter, sizeof(int));
     f.write((const char*)&LoosesByBlackJack, sizeof(int));
     f.write((const char*)&chips, sizeof(int));
+
     f.close();
 }
 void Player::ReadStatistics(string S)
 {
     ifstream f(S, ios::binary);
-    f.read((char*)&MaxLeftStepsCounter, sizeof(int));
-    f.read((char*)&MaxRightStepsCounter, sizeof(int));
-    f.read((char*)&MaxSumStepsCounter, sizeof(int));
-    f.read((char*)&MaxChips, sizeof(int));
-    f.read((char*)&VictorysCounter, sizeof(int));
-    f.read((char*)&LosesCounter, sizeof(int));
-    f.read((char*)&VictorysByBlackJack, sizeof(int));
-    f.read((char*)&CloseWins, sizeof(int));
-    f.read((char*)&NumberOfGames, sizeof(int));
-    f.read((char*)&DrawsCounter, sizeof(int));
-    f.read((char*)&LoosesByBlackJack, sizeof(int));
-    f.read((char*)&chips, sizeof(int));
-    f.close();
+    if (f.is_open())
+    {
+        f.read((char*)&MaxLeftStepsCounter, sizeof(int));
+        f.read((char*)&MaxRightStepsCounter, sizeof(int));
+        f.read((char*)&MaxSumStepsCounter, sizeof(int));
+        f.read((char*)&MaxChips, sizeof(int));
+        f.read((char*)&VictorysCounter, sizeof(int));
+        f.read((char*)&LosesCounter, sizeof(int));
+        f.read((char*)&VictorysByBlackJack, sizeof(int));
+        f.read((char*)&CloseWins, sizeof(int));
+        f.read((char*)&NumberOfGames, sizeof(int));
+        f.read((char*)&DrawsCounter, sizeof(int));
+        f.read((char*)&LoosesByBlackJack, sizeof(int));
+        f.read((char*)&chips, sizeof(int));
+        f.close();
+    }
 }
 void Player::Split(Player& player, Player& dealer, Deck& deck)
 {
     if (CheckOnSplit(player))
     {
-        if (Game::CheckBet(player))
-        {
+
             bool flag = true;
             bool leftHandDouble = false;
             bool rightHandDouble = false;
@@ -93,8 +108,6 @@ void Player::Split(Player& player, Player& dealer, Deck& deck)
                         flag = false;
                         break;
                     }
-                    else
-                        cout << "У Вас не хватает фишек" << endl;
                     break;
                 case'0':
                     flag = false;
@@ -139,7 +152,7 @@ void Player::Split(Player& player, Player& dealer, Deck& deck)
                     }
                     break;
                 case '2':
-                    if (player.getLeftStepsCounter() > 2)
+                    if (player.getRightStepsCounter() > 2)
                         cout << "Введите допустимый вариант" << endl;
                     else if (Game::CheckBet(player))
                     {
@@ -148,8 +161,6 @@ void Player::Split(Player& player, Player& dealer, Deck& deck)
                         flag = false;
                         break;
                     }
-                    else
-                        cout << "У Вас не хватает фишек" << endl;
                     break;
                 case'0':
                     Game::showScore(dealer, "d");
@@ -163,7 +174,6 @@ void Player::Split(Player& player, Player& dealer, Deck& deck)
             }
             Game::isLoss(player, dealer, leftHandDouble, rightHandDouble);
         }
-    }
 }
     void Player::addLoses()
     {
