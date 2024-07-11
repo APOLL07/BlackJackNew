@@ -145,32 +145,30 @@ int main()
             player.showChips();
             if (player.getChips() < 20)
                 flag3 = true;
-            while (flag3)
+            if (player.getChips() < 10)
             {
-                cout << "Желаете пополнить баланс?" << endl;
-                cout << "1 - Да" << endl;
-                cout << "0 - Нет" << endl;
-                cin >> choise;
-                switch (choise)
+                while (flag3)
                 {
-                case 1:
-                    if (player.getChips() >= 20)
-                        cout << "В этом нет необходимости, у Вас достаточно фишек" << endl;
-                    else
+                    cout << "Желаете пополнить баланс?" << endl;
+                    cout << "1 - Да" << endl;
+                    cout << "0 - Нет" << endl;
+                    cin >> choise;
+                    switch (choise)
                     {
-                        cout << "Ваш баланс пополнен, приятной игры!" << endl;
-                        player.setChips(20);
-                        player.writeStatistics(S);
+                    case 1:
+                            cout << "Ваш баланс пополнен, приятной игры!" << endl;
+                            player.setChips(20);
+                            player.writeStatistics(S);
+                            flag3 = false;                        
+                        break;
+                    case 0:
+                        cout << "Приятной игры!" << endl;
                         flag3 = false;
+                        break;
+                    default:
+                        cout << "Введите возможный вариант" << endl;
+                        break;
                     }
-                    break;
-                case 0:
-                    cout << "Приятной игры!" << endl;
-                    flag3 = false;
-                    break;
-                default:
-                    cout << "Введите возможный вариант" << endl;
-                    break;
                 }
             }
             break;
